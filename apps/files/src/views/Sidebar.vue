@@ -26,7 +26,7 @@
 		This is necessary because with v-if, the 'closed' event is emitted after the destruction of AppSidebar, and all the event listeners are unbound and won't be triggered.
 	-->
 	<AppSidebar
-		v-show="file"
+		v-if="file"
 		ref="sidebar"
 		v-bind="appSidebar"
 		:force-menu="true"
@@ -114,6 +114,7 @@ export default {
 			loading: true,
 			fileInfo: null,
 			starLoading: false,
+			isFullScreen: false,
 		}
 	},
 
@@ -206,7 +207,10 @@ export default {
 					'star-loading': this.starLoading,
 					active: this.activeTab,
 					background: this.background,
-					class: { 'has-preview': this.fileInfo.hasPreview },
+					class: {
+						'has-preview': this.fileInfo.hasPreview,
+						'app-sidebar--full': this.isFullScreen,
+					},
 					compact: !this.fileInfo.hasPreview,
 					loading: this.loading,
 					starred: this.fileInfo.isFavourited,
@@ -433,6 +437,14 @@ export default {
 		},
 
 		/**
+		 * Allow to set the Sidebar as fullscreen from OCA.Files.Sidebar
+		 * @param {boolean} isFullScreen - Wether or not to render the Sidebar in fullscreen.
+		 */
+		setFullScreenMode(isFullScreen) {
+			this.isFullScreen = isFullScreen
+		},
+
+		/**
 		 * Emit SideBar events.
 		 */
 		handleOpening() {
@@ -463,6 +475,13 @@ export default {
 				background-size: contain;
 			}
 		}
+	}
+
+	&--full {
+		position: fixed !important;
+		z-index: 2025 !important;
+		top: 0 !important;
+		height: 100% !important;
 	}
 }
 </style>
