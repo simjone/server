@@ -26,7 +26,7 @@
 		This is necessary because with v-if, the 'closed' event is emitted after the destruction of AppSidebar, and all the event listeners are unbound and won't be triggered.
 	-->
 	<AppSidebar
-		v-if="file"
+		v-show="file"
 		ref="sidebar"
 		v-bind="appSidebar"
 		:force-menu="true"
