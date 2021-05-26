@@ -21,6 +21,10 @@
   -->
 
 <template>
+	<!--
+		For the 'handleClosed' event listener, we need to listen to the 'hook:destroyed' event instead of the 'closed' event.
+		This is necessary because with v-if, the 'closed' event is emitted after the destruction of AppSidebar, and all the event listeners are unbound and won't be triggered.
+	-->
 	<AppSidebar
 		v-if="file"
 		ref="sidebar"
@@ -29,7 +33,11 @@
 		@close="close"
 		@update:active="setActiveTab"
 		@update:starred="toggleStarred"
-		@[defaultActionListener].stop.prevent="onDefaultAction">
+		@[defaultActionListener].stop.prevent="onDefaultAction"
+		@opening="handleOpening"
+		@opened="handleOpened"
+		@closing="handleClosing"
+		@hook:destroyed="handleClosed">
 		<!-- TODO: create a standard to allow multiple elements here? -->
 		<template v-if="fileInfo" #description>
 			<LegacyView v-for="view in views"
@@ -78,6 +86,7 @@
 import { encodePath } from '@nextcloud/paths'
 import $ from 'jquery'
 import axios from '@nextcloud/axios'
+import { emit } from '@nextcloud/event-bus'
 import AppSidebar from '@nextcloud/vue/dist/Components/AppSidebar'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import EmptyContent from '@nextcloud/vue/dist/Components/EmptyContent'
@@ -421,6 +430,22 @@ export default {
 		close() {
 			this.Sidebar.file = ''
 			this.resetData()
+		},
+
+		/**
+		 * Emit SideBar events.
+		 */
+		handleOpening() {
+			emit('files:sidebar:opening')
+		},
+		handleOpened() {
+			emit('files:sidebar:opened')
+		},
+		handleClosing() {
+			emit('files:sidebar:closing')
+		},
+		handleClosed() {
+			emit('files:sidebar:closed')
 		},
 	},
 }
